@@ -45,19 +45,21 @@ MutichannelGasSensor::MutichannelGasSensor() : __version(2), i2cAddress(0x19) {
 void MutichannelGasSensor::begin(int address) {
     __version = 1;          // version 1/2
     r0_inited = false;
-
-    Wire.begin();
+Serial.println("Wire begin()");
+    Wire.begin(4, 5);
+Serial.println("...done");
     i2cAddress = address;
     __version = getVersion();
 }
 
 unsigned char MutichannelGasSensor::getVersion() {
+  Serial.println("before");
     if (get_addr_dta(CMD_READ_EEPROM, ADDR_IS_SET) == 1126) {     // get version
         __version = 2;
         _SERIAL.println("version = 2");
         return 2;
     }
-
+Serial.println("after");
     __version = 1;
     _SERIAL.println("version = 1");
     return 1;

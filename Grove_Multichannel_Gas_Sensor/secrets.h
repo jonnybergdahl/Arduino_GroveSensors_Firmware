@@ -1,6 +1,6 @@
-#define WIFI_SSID "BERGDAHL"
-#define WIFI_PASSWORD "qwerty123456"
+#define WIFI_SSID "your-wifi-ssid"
+#define WIFI_PASSWORD "your-wifi-password"
 
-#define MQTT_SERVER "172.30.1.22"
-#define MQTT_USER "mqttclient"
-#define MQTT_PASSWORD "vG4pbft@QCir"
+#define MQTT_SERVER "your-mqtt-server"
+#define MQTT_USER "your-mqtt-user"
+#define MQTT_PASSWORD "your-mqtt-password"

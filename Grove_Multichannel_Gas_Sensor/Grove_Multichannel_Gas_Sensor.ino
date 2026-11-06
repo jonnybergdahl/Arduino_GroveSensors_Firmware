@@ -43,10 +43,47 @@ uint64_t lastPublish = 0;
 
 void setup() {
   Serial.begin(115200);  // start serial for output
+delay(2000);
+  Wire.begin(4, 5);
+  Wire.setTimeout(100);
+byte error, address;
+  int nDevices;
+  Serial.println("Scanning...");
+  nDevices = 0;
+  for(address = 1; address < 10; address++ ) {
+    Wire.beginTransmission(address);
+    error = Wire.endTransmission();
+    Serial.print(address);
+    Serial.print(", ");
+    Serial.println(error);
+    if (error == 0) {
+      Serial.print("I2C device found at address 0x");
+      if (address<16) {
+        Serial.print("0");
+      }
+      Serial.println(address,HEX);
+      nDevices++;
+    }
+    else if (error==4) {
+      Serial.print("Unknow error at address 0x");
+      if (address<16) {
+        Serial.print("0");
+      }
+      Serial.println(address,HEX);
+    }    
+  }
+  if (nDevices == 0) {
+    Serial.println("No I2C devices found\n");
+  }
+  else {
+    Serial.println("done\n");
+  }
+
   Serial.println("Gas sensor client");
   setup_wifi();
   mqttClient.setServer(MQTT_SERVER, 1883);
   
+  Serial.println("Setting up gas sensor");
   gas.begin(MCGS_I2C_ADDRESS);//the default I2C address of the slave is 0x04
 
   Serial.print("Gas sensor firmware version: ");
@@ -57,7 +94,7 @@ void setup() {
 void loop() 
 {
   float c;
-
+  Serial.println("loop");
   if (!mqttClient.connected()) 
   {
     reconnect();
