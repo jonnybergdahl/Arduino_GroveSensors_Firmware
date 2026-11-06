@@ -6,7 +6,7 @@ Arduino firmware for ESP32 boards (TinyPICO) that read air quality sensors and p
 |--------|--------|-----------|--------|
 | [Grove_CO2_Sensor](Grove_CO2_Sensor) | [Seeed Grove CO2 Sensor](https://wiki.seeedstudio.com/Grove-CO2_Sensor/) | UART | Work in progress |
 | [Grove_Multichannel_Gas_Sensor](Grove_Multichannel_Gas_Sensor) | [Seeed Grove Multichannel Gas Sensor v1](https://wiki.seeedstudio.com/Grove-Multichannel_Gas_Sensor/) | I2C | Working, with debug output |
-| [ZH03B_Particle_Sensor](ZH03B_Particle_Sensor) | Winsen ZH03B particle sensor | UART | Work in progress, does not compile yet |
+| [ZH03B_Particle_Sensor](ZH03B_Particle_Sensor) | Winsen ZH03B particle sensor | UART | Home Assistant MQTT discovery, compiles but not yet tested on hardware |
 
 ## Requirements
 
@@ -80,31 +80,40 @@ At startup, the sketch scans the I2C bus and prints the devices it finds to the 
 
 ## ZH03B_Particle_Sensor
 
-Firmware for a TinyPICO connected to a ZH03B particle sensor. It reads PM1.0, PM2.5 and PM10 every 30 seconds and publishes them as JSON together with WiFi information. It will also announce the sensors to Home Assistant through MQTT discovery.
-
-> **Work in progress:** the Home Assistant discovery code is not finished, and the sketch does not compile yet.
+Firmware for a TinyPICO connected to a ZH03B particle sensor. Every 30 seconds it reads PM1.0, PM2.5 and PM10 and publishes them as JSON, together with WiFi information. At connect it announces the sensors to Home Assistant through MQTT discovery, so they show up as a device without any YAML.
 
 **Wiring**
+
+The sensor uses UART on GPIO 21/22, which is the QWIIC/STEMMA QT connector on [PCB_TinyPico_SensorBoard](https://github.com/jonnybergdahl/PCB_TinyPico_SensorBoard). See [pinout.png](ZH03B_Particle_Sensor/pinout.png) for the sensor's connector.
 
 | ZH03B | TinyPICO |
 |-------|----------|
 | Pin 1, VDD | 5V |
 | Pin 2, GND | GND |
-| Pin 4, RXD | GPIO 25 |
-| Pin 5, TXD | GPIO 26 |
+| Pin 4, RXD | GPIO 21 (TX) |
+| Pin 5, TXD | GPIO 22 (RX) |
 
-This is the wiring from the sketch header. The code opens `Serial2` with RX on GPIO 25 and TX on GPIO 26, which would need TXD and RXD the other way round. If you get no readings, swap the two wires.
+**Libraries:** [SD_ZH03B](https://github.com/ShaggyDog18/SD_ZH03B), [PubSubClient](https://github.com/knolleary/pubsubclient), [ArduinoJson](https://arduinojson.org/) v7
 
-**Libraries:** [SD_ZH03B](https://github.com/ShaggyDog18/SD_ZH03B), [PubSubClient](https://github.com/knolleary/pubsubclient), [ArduinoJson](https://arduinojson.org/)
+**Board:** select *UM TinyPICO* (`esp32:esp32:um_tinypico`) in the Arduino IDE.
 
-**MQTT topics** (`<node>` is `particlesensor-<chip id>`)
+**Home Assistant entities** (on a device named `<node>`, where `<node>` is `tp_ZH03B-<chip id>`)
+
+| Entity | Device class | Unit |
+|--------|--------------|------|
+| `<node> PM1` | `pm1` | µg/m³ |
+| `<node> PM2.5` | `pm25` | µg/m³ |
+| `<node> PM10` | `pm10` | µg/m³ |
+| `<node> WiFi` | `signal_strength` (diagnostic, with SSID and IP as attributes) | dBm |
+
+**MQTT topics**
 
 | Topic | Content |
 |-------|---------|
-| `particlesensor/<node>/status` | `online` or `offline` (last will) |
-| `particlesensor/<node>/state` | JSON with `pm01`, `pm25`, `pm10` and `wifi` (`ssid`, `ip`, `rssi`) |
-| `particlesensor/<node>/command` | Subscribed, not used yet |
-| `homeassistant/sensor/particlesensor/<node>_*/config` | Home Assistant discovery |
+| `homeassistant/sensor/<node>/status` | Availability, `online` or `offline` (last will), retained |
+| `homeassistant/sensor/<node>/state` | JSON with `pm01`, `pm25`, `pm10` and `wifi` (`ssid`, `ip`, `rssi`), retained |
+| `homeassistant/sensor/<node>/command` | Subscribed, not used yet |
+| `homeassistant/sensor/<node>_<sensor>/config` | Discovery config for `wifi`, `pm1`, `pm25` and `pm10`, retained |
 
 ## License
 
