@@ -57,7 +57,7 @@ Reads CO2 concentration and temperature from the Grove CO2 sensor every 10 secon
 
 ## Grove_Multichannel_Gas_Sensor
 
-Reads eight gas concentrations from the Multichannel Gas Sensor every 60 seconds. The sensor uses I2C address `0x04`, on GPIO 4 (SDA) and GPIO 5 (SCL).
+Reads eight gas concentrations from the Multichannel Gas Sensor every 60 seconds. The sensor uses I2C address `0x04`, on GPIO 5 (SDA) and GPIO 4 (SCL), which is the Grove connector on [PCB_TinyPico_SensorBoard](https://github.com/jonnybergdahl/PCB_TinyPico_SensorBoard).
 
 Seeed's [Mutichannel_Gas_Sensor](https://github.com/Seeed-Studio/Mutichannel_Gas_Sensor) library only supports AVR boards, so a modified copy of it is included in the sketch folder.
 

@@ -44,7 +44,7 @@ uint64_t lastPublish = 0;
 void setup() {
   Serial.begin(115200);  // start serial for output
 delay(2000);
-  Wire.begin(4, 5);
+  Wire.begin(5, 4);      // SDA = GPIO5, SCL = GPIO4 (Grove connector on PCB_TinyPico_SensorBoard)
   Wire.setTimeout(100);
 byte error, address;
   int nDevices;

@@ -46,7 +46,7 @@ void MutichannelGasSensor::begin(int address) {
     __version = 1;          // version 1/2
     r0_inited = false;
 Serial.println("Wire begin()");
-    Wire.begin(4, 5);
+    Wire.begin(5, 4);      // SDA = GPIO5, SCL = GPIO4
 Serial.println("...done");
     i2cAddress = address;
     __version = getVersion();
